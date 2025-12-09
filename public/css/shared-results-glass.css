@@ -1,0 +1,1759 @@
+/**
+ * ==========================================================================
+ * GLASSMORPHISM RESULTS CSS - Design moderne avec effets de verre
+ * ==========================================================================
+ * Emplacement: public/css/shared-results.css
+ * ==========================================================================
+ */
+
+/* ==========================================================================
+   1. VARIABLES & BASE
+   ========================================================================== */
+
+:root {
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-bg-light: rgba(255, 255, 255, 0.5);
+    --glass-border: rgba(255, 255, 255, 0.3);
+    --glass-shadow: 0 8px 32px rgba(102, 126, 234, 0.12);
+    --glass-blur: blur(12px);
+
+    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    --gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    --gradient-info: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+
+    --border-light: rgba(102, 126, 234, 0.1);
+    --border-hover: rgba(102, 126, 234, 0.3);
+}
+
+/* ==========================================================================
+   2. STATS CARDS - Glassmorphism
+   ========================================================================== */
+
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.stats-row.stats-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.stats-row.stats-mini {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.stat-card {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: var(--glass-shadow);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    min-width: 0;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--gradient-primary);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(102, 126, 234, 0.2);
+    border-color: var(--border-hover);
+}
+
+.stat-card:hover::before {
+    opacity: 1;
+}
+
+.stat-card.mini {
+    padding: 1.25rem;
+}
+
+.stat-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    color: white;
+    flex-shrink: 0;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card.mini .stat-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 1.2rem;
+}
+
+.stat-icon.primary { background: var(--gradient-primary); }
+.stat-icon.success { background: var(--gradient-success); }
+.stat-icon.info { background: var(--gradient-info); }
+.stat-icon.warning { background: var(--gradient-warning); }
+.stat-icon.danger { background: var(--gradient-danger); }
+
+.stat-content {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.stat-content h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.25rem 0;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.stat-card.mini .stat-content h3 {
+    font-size: 1rem;
+}
+
+.stat-content p {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin: 0;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ==========================================================================
+   3. TABLEAUX - Glassmorphism
+   ========================================================================== */
+
+.table-scroll-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 12px;
+}
+
+.table-results {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 800px;
+}
+
+.table-results th {
+    padding: 1rem 0.75rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: rgba(102, 126, 234, 0.05);
+    border-bottom: 2px solid var(--border-light);
+}
+
+.table-results td {
+    padding: 1rem 0.75rem;
+    text-align: left;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-light);
+    background: var(--glass-bg-light);
+    transition: background 0.2s ease;
+}
+
+.table-results tbody tr {
+    transition: all 0.2s ease;
+}
+
+.table-results tbody tr:hover td {
+    background: rgba(102, 126, 234, 0.08);
+}
+
+.table-results .col-note {
+    text-align: center;
+    min-width: 60px;
+}
+
+.table-results .col-fixed {
+    min-width: 180px;
+}
+
+/* ==========================================================================
+   4. CELLULES COLORÉES - Style moderne
+   ========================================================================== */
+
+.cell-good {
+    background: rgba(16, 185, 129, 0.12) !important;
+    color: #059669 !important;
+    font-weight: 600;
+    border-radius: 6px;
+}
+
+.cell-warning {
+    background: rgba(245, 158, 11, 0.12) !important;
+    color: #d97706 !important;
+    font-weight: 600;
+    border-radius: 6px;
+}
+
+.cell-danger {
+    background: rgba(239, 68, 68, 0.12) !important;
+    color: #dc2626 !important;
+    font-weight: 600;
+    border-radius: 6px;
+}
+
+/* ==========================================================================
+   5. BADGES - Glassmorphism
+   ========================================================================== */
+
+.moyenne-badge {
+    padding: 0.4rem 0.65rem;
+    border-radius: 8px;
+    font-weight: 700;
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.moy-success { background: var(--gradient-success); }
+.moy-warning { background: var(--gradient-warning); }
+.moy-danger { background: var(--gradient-danger); }
+
+.badge-primary {
+    background: rgba(102, 126, 234, 0.12);
+    color: #667eea;
+    padding: 0.35rem 0.65rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.appreciation-badge {
+    padding: 0.4rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.badge-success {
+    background: rgba(16, 185, 129, 0.12);
+    color: #059669;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.badge-warning {
+    background: rgba(245, 158, 11, 0.12);
+    color: #d97706;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.badge-danger {
+    background: rgba(239, 68, 68, 0.12);
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.badge-count {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(8px);
+    color: white;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* ==========================================================================
+   6. BOUTONS - Style moderne
+   ========================================================================== */
+
+.header-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.btn-back {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 0.6rem 1.25rem;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-back:hover {
+    background: rgba(255, 255, 255, 0.35);
+    color: white;
+    transform: translateX(-2px);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.btn-action {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-action:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    color: white;
+}
+
+.btn-view { background: var(--gradient-info); }
+.btn-pdf { background: var(--gradient-primary); }
+
+/* ==========================================================================
+   7. CARDS MOBILE - Glassmorphism
+   ========================================================================== */
+
+.mobile-cards {
+    display: none;
+}
+
+.result-card {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    box-shadow: var(--glass-shadow);
+    transition: all 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.result-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(102, 126, 234, 0.15);
+}
+
+.result-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1rem;
+    background: rgba(102, 126, 234, 0.03);
+    border-bottom: 1px solid var(--border-light);
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.result-info {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.result-info h4 {
+    margin: 0 0 0.35rem 0;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    font-weight: 600;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    line-height: 1.3;
+}
+
+.result-info p {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.result-card-body {
+    padding: 1rem;
+}
+
+.notes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.note-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 0.25rem;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+    min-width: 0;
+    text-align: center;
+}
+
+.note-item:hover {
+    transform: scale(1.02);
+    border-color: var(--border-hover);
+}
+
+.note-label {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+.note-value {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-top: 0.1rem;
+    white-space: nowrap;
+}
+
+.note-item.cell-good {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.25);
+}
+
+.note-item.cell-good .note-value { color: #059669; }
+
+.note-item.cell-warning {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.25);
+}
+
+.note-item.cell-warning .note-value { color: #d97706; }
+
+.note-item.cell-danger {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.25);
+}
+
+.note-item.cell-danger .note-value { color: #dc2626; }
+
+/* ==========================================================================
+   8. PROF CARDS - Glassmorphism
+   ========================================================================== */
+
+.prof-info {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+}
+
+.prof-avatar {
+    width: 44px;
+    height: 44px;
+    background: var(--gradient-primary);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1rem;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.prof-card {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    box-shadow: var(--glass-shadow);
+    transition: all 0.3s ease;
+}
+
+.prof-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(102, 126, 234, 0.15);
+    border-color: var(--border-hover);
+}
+
+.prof-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1rem;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.prof-card-header .prof-info {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.prof-card-header h4 {
+    margin: 0 0 0.4rem 0;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    font-weight: 600;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.3;
+}
+
+.prof-card-footer {
+    display: flex;
+    border-top: 1px solid var(--border-light);
+    background: rgba(102, 126, 234, 0.02);
+}
+
+.btn-card {
+    flex: 1;
+    padding: 0.75rem 0.5rem;
+    text-align: center;
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    transition: all 0.3s ease;
+    border-right: 1px solid var(--border-light);
+    white-space: nowrap;
+}
+
+.btn-card:last-child {
+    border-right: none;
+}
+
+.btn-card:hover {
+    background: rgba(102, 126, 234, 0.08);
+    color: var(--text-primary);
+}
+
+.btn-card-primary {
+    background: var(--gradient-primary);
+    color: white;
+}
+
+.btn-card-primary:hover {
+    background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+/* ==========================================================================
+   9. NIVEAU CARDS - Glassmorphism
+   ========================================================================== */
+
+.niveau-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.25rem;
+}
+
+.niveau-card {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.5rem;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: var(--glass-shadow);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.niveau-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--gradient-primary);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.niveau-card:hover {
+    transform: translateY(-4px) translateX(2px);
+    box-shadow: 0 16px 48px rgba(102, 126, 234, 0.2);
+    border-color: var(--border-hover);
+}
+
+.niveau-card:hover::after {
+    opacity: 1;
+}
+
+.niveau-icon {
+    width: 56px;
+    height: 56px;
+    background: var(--gradient-primary);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.niveau-content {
+    flex: 1;
+}
+
+.niveau-content h4 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+}
+
+.niveau-stats {
+    display: flex;
+    gap: 1rem;
+}
+
+.niveau-stats .stat {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 500;
+}
+
+.niveau-stats .stat i {
+    color: #667eea;
+}
+
+.niveau-arrow {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.niveau-card:hover .niveau-arrow {
+    transform: translateX(6px);
+    color: #667eea;
+}
+
+/* ==========================================================================
+   10. SÉLECTEUR DE CLASSE - Glassmorphism
+   ========================================================================== */
+
+.classe-select {
+    width: 100%;
+    padding: 1rem 1.25rem;
+    border: 2px solid var(--border-light);
+    border-radius: 12px;
+    font-size: 1rem;
+    color: var(--text-primary);
+    background: var(--glass-bg-light);
+    backdrop-filter: blur(8px);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.classe-select:hover {
+    border-color: var(--border-hover);
+}
+
+.classe-select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+/* ==========================================================================
+   11. LOADING SPINNER - Style moderne
+   ========================================================================== */
+
+.loading-zone {
+    text-align: center;
+    padding: 4rem 1rem;
+}
+
+.loading-box {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 2.5rem 3rem;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    box-shadow: var(--glass-shadow);
+}
+
+.loading-box p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 3px solid rgba(102, 126, 234, 0.15);
+    border-top-color: #667eea;
+    border-radius: 50%;
+    animation: spin 0.8s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ==========================================================================
+   12. UTILITIES
+   ========================================================================== */
+
+.mt-4 { margin-top: 1.5rem; }
+.mb-4 { margin-bottom: 1.5rem; }
+
+/* ==========================================================================
+   13. RESPONSIVE BREAKPOINTS
+   ========================================================================== */
+
+@media (max-width: 1200px) {
+    .stats-row,
+    .stats-row.stats-3,
+    .stats-row.stats-mini {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 992px) {
+    .table-scroll-wrapper,
+    #desktopTable {
+        display: none;
+    }
+
+    .mobile-cards {
+        display: block !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .stats-row {
+        gap: 1rem;
+    }
+
+    .stat-card {
+        padding: 1.25rem;
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 1.15rem;
+    }
+
+    .stat-content h3 {
+        font-size: 1.1rem;
+    }
+
+    .btn-text {
+        display: none;
+    }
+
+    .header-actions {
+        width: 100%;
+    }
+
+    .notes-grid {
+        gap: 0.5rem;
+    }
+
+    .note-item {
+        padding: 0.5rem 0.25rem;
+    }
+
+    .note-label {
+        font-size: 0.65rem;
+    }
+
+    .note-value {
+        font-size: 0.85rem;
+    }
+
+    .niveau-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .niveau-card {
+        padding: 1.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-row,
+    .stats-row.stats-3,
+    .stats-row.stats-mini {
+        grid-template-columns: 1fr;
+    }
+
+    .result-card-header,
+    .prof-card-header {
+        flex-direction: column;
+    }
+
+    .result-card-header .moyenne-badge,
+    .prof-card-header .moyenne-badge {
+        align-self: flex-start;
+        margin-top: 0.5rem;
+    }
+
+    .notes-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+/* ==========================================================================
+   14. TABS
+   ========================================================================== */
+
+.tabs-nav {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border-light);
+}
+
+.tab-btn {
+    padding: 0.85rem 1.5rem;
+    background: var(--glass-bg-light);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    font-family: inherit;
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tab-btn:hover {
+    background: rgba(102, 126, 234, 0.1);
+    border-color: var(--border-hover);
+    color: #667eea;
+}
+
+.tab-btn.active {
+    background: var(--gradient-primary);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-actions {
+    margin-bottom: 1.25rem;
+}
+
+/* ==========================================================================
+   15. MODALS - Glassmorphism
+   ========================================================================== */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    padding: 1rem;
+}
+
+.modal-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+    transform: scale(0.9) translateY(20px);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-overlay.show .modal-content {
+    transform: scale(1) translateY(0);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    background: var(--gradient-primary);
+    color: white;
+    border-radius: 20px 20px 0 0;
+}
+
+.modal-header h5 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modal-close {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    font-size: 1.25rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border-light);
+    background: rgba(102, 126, 234, 0.02);
+}
+
+/* ==========================================================================
+   16. FORMS - Modern Style
+   ========================================================================== */
+
+.form-modern {
+    max-width: 600px;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.form-label i {
+    color: #667eea;
+}
+
+.required {
+    color: #ef4444;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    background: var(--glass-bg-light);
+    border: 2px solid var(--border-light);
+    border-radius: 10px;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    background: white;
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-hint {
+    display: block;
+    margin-top: 0.35rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.form-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+}
+
+/* Radio Cards */
+.radio-cards {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 0.5rem;
+}
+
+.radio-card {
+    cursor: pointer;
+    display: block;
+}
+
+.radio-card input {
+    display: none;
+}
+
+.radio-card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1.5rem 2rem;
+    background: var(--glass-bg-light);
+    border: 2px solid var(--border-light);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.radio-card-content i {
+    font-size: 1.5rem;
+    color: var(--text-muted);
+}
+
+.radio-card-content span {
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.radio-card:hover .radio-card-content {
+    border-color: var(--border-hover);
+}
+
+.radio-card input:checked + .radio-card-content {
+    border-color: #667eea;
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.radio-card input:checked + .radio-card-content i,
+.radio-card input:checked + .radio-card-content span {
+    color: #667eea;
+}
+
+/* Question Form */
+.question-form {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.question-form .form-textarea {
+    flex: 1;
+}
+
+/* ==========================================================================
+   17. ACTION CARDS
+   ========================================================================== */
+
+.action-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+.action-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: var(--glass-bg-light);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.action-card:hover {
+    border-color: var(--border-hover);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+}
+
+.action-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.action-icon.success { background: var(--gradient-success); }
+.action-icon.info { background: var(--gradient-info); }
+.action-icon.warning { background: var(--gradient-warning); }
+.action-icon.primary { background: var(--gradient-primary); }
+.action-icon.danger { background: var(--gradient-danger); }
+
+.action-content {
+    flex: 1;
+}
+
+.action-content h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 0.25rem 0;
+}
+
+.action-content p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.action-arrow {
+    color: var(--text-muted);
+    transition: all 0.3s ease;
+}
+
+.action-card:hover .action-arrow {
+    color: #667eea;
+    transform: translateX(4px);
+}
+
+/* ==========================================================================
+   18. PROGRESS BARS
+   ========================================================================== */
+
+.progress-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.progress-bar-mini {
+    flex: 1;
+    height: 8px;
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    min-width: 80px;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.progress-fill.success { background: var(--gradient-success); }
+.progress-fill.warning { background: var(--gradient-warning); }
+.progress-fill.danger { background: var(--gradient-danger); }
+
+.progress-value {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    min-width: 45px;
+}
+
+/* ==========================================================================
+   19. FILE UPLOAD
+   ========================================================================== */
+
+.file-upload {
+    position: relative;
+}
+
+.file-upload input[type="file"] {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.file-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem;
+    background: var(--glass-bg-light);
+    border: 2px dashed var(--border-light);
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.file-label:hover {
+    border-color: #667eea;
+    background: rgba(102, 126, 234, 0.05);
+}
+
+.file-label i {
+    font-size: 2.5rem;
+    color: #667eea;
+    margin-bottom: 0.75rem;
+}
+
+.file-label span {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+/* ==========================================================================
+   20. ADDITIONAL BADGES & STATUS
+   ========================================================================== */
+
+.badge-info {
+    background: rgba(59, 130, 246, 0.12);
+    color: #1d4ed8;
+    padding: 0.35rem 0.65rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.badge-count-inline {
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.badge-count-inline.success {
+    background: rgba(16, 185, 129, 0.12);
+    color: #059669;
+}
+
+.badge-count-inline.warning {
+    background: rgba(245, 158, 11, 0.12);
+    color: #d97706;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-active {
+    background: rgba(16, 185, 129, 0.12);
+    color: #059669;
+}
+
+.status-inactive,
+.status-pending {
+    background: rgba(245, 158, 11, 0.12);
+    color: #d97706;
+}
+
+.role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.role-super-admin {
+    background: var(--gradient-primary);
+    color: white;
+}
+
+.role-admin {
+    background: rgba(245, 158, 11, 0.12);
+    color: #d97706;
+}
+
+.role-user {
+    background: rgba(59, 130, 246, 0.12);
+    color: #1d4ed8;
+}
+
+/* ==========================================================================
+   21. USER INFO
+   ========================================================================== */
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    background: var(--gradient-primary);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.email-link {
+    color: #667eea;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.email-link:hover {
+    color: #5a67d8;
+    text-decoration: underline;
+}
+
+/* ==========================================================================
+   22. ROLES GRID
+   ========================================================================== */
+
+.roles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+.role-info-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: var(--glass-bg-light);
+    border-radius: 12px;
+    border: 1px solid var(--border-light);
+}
+
+.role-info-card p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   23. EXAMPLE TABLE
+   ========================================================================== */
+
+.example-table {
+    background: var(--glass-bg-light);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border-light);
+    margin: 1rem 0;
+}
+
+.example-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.example-table th {
+    background: var(--gradient-primary);
+    color: white;
+    padding: 0.85rem 1rem;
+    font-weight: 600;
+    text-align: left;
+}
+
+.example-table td {
+    padding: 0.65rem 1rem;
+    border-bottom: 1px solid var(--border-light);
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+}
+
+/* ==========================================================================
+   24. GRIDS
+   ========================================================================== */
+
+.grid-2-cols {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 1.5rem;
+}
+
+.actions-bar {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   25. ADDITIONAL BUTTONS
+   ========================================================================== */
+
+.btn-block {
+    width: 100%;
+}
+
+.btn-secondary {
+    background: var(--glass-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-light);
+}
+
+.btn-secondary:hover {
+    background: rgba(102, 126, 234, 0.1);
+    border-color: var(--border-hover);
+}
+
+.btn-warning {
+    background: var(--gradient-warning);
+    color: white;
+    box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3);
+}
+
+.btn-warning:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
+}
+
+.btn-danger {
+    background: var(--gradient-danger);
+    color: white;
+    box-shadow: 0 2px 10px rgba(239, 68, 68, 0.3);
+}
+
+.btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4);
+}
+
+.btn-action.btn-edit {
+    background: rgba(102, 126, 234, 0.15);
+    color: #667eea;
+}
+
+.btn-action.btn-edit:hover {
+    background: #667eea;
+    color: white;
+}
+
+.btn-action.btn-save {
+    background: var(--gradient-success);
+}
+
+.btn-action.btn-success {
+    background: var(--gradient-success);
+}
+
+.btn-action.btn-warning {
+    background: var(--gradient-warning);
+}
+
+.btn-action.btn-secondary {
+    background: rgba(100, 116, 139, 0.15);
+    color: #64748b;
+}
+
+.btn-action.btn-secondary:hover {
+    background: #64748b;
+    color: white;
+}
+
+.btn-action.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* ==========================================================================
+   26. CODE & MISC
+   ========================================================================== */
+
+code,
+.matricule-code {
+    background: rgba(102, 126, 234, 0.1);
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    color: #667eea;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.text-muted {
+    color: var(--text-muted);
+}
+
+/* ==========================================================================
+   PROF INFO (table row)
+   ========================================================================== */
+
+.prof-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.prof-avatar-sm {
+    width: 36px;
+    height: 36px;
+    background: var(--gradient-primary);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+    box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+}
+
+.note-value {
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.section-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+}
+
+.section-text {
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}
+
+.alert-link {
+    color: #667eea;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.alert-link:hover {
+    text-decoration: underline;
+}
+
+/* Stat card highlight */
+.stat-card-highlight {
+    background: var(--gradient-primary) !important;
+    color: white;
+}
+
+.stat-card-highlight .stat-icon {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.stat-card-highlight .stat-content h3 {
+    color: white;
+}
+
+.stat-card-highlight .stat-content p {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* ==========================================================================
+   27. ANIMATIONS
+   ========================================================================== */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.stat-card,
+.result-card,
+.prof-card,
+.niveau-card,
+.action-card {
+    animation: fadeInUp 0.4s ease-out;
+}
+
+.stats-row .stat-card:nth-child(1) { animation-delay: 0.05s; }
+.stats-row .stat-card:nth-child(2) { animation-delay: 0.1s; }
+.stats-row .stat-card:nth-child(3) { animation-delay: 0.15s; }
+.stats-row .stat-card:nth-child(4) { animation-delay: 0.2s; }
+
+/* ==========================================================================
+   28. RESPONSIVE ADDITIONS
+   ========================================================================== */
+
+@media (max-width: 768px) {
+    .tabs-nav {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 0.75rem;
+    }
+
+    .tab-btn {
+        padding: 0.75rem 1rem;
+        white-space: nowrap;
+    }
+
+    .tab-text {
+        display: none;
+    }
+
+    .radio-cards {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .radio-card-content {
+        flex-direction: row;
+        padding: 1rem 1.5rem;
+    }
+
+    .grid-2-cols {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-content {
+        margin: 1rem;
+        max-height: calc(100vh - 2rem);
+    }
+
+    .action-grid {
+        grid-template-columns: 1fr;
+    }
+}
