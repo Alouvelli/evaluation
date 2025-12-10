@@ -41,13 +41,13 @@ class EvaluationsController extends Controller
 
         if (!$etudiant) {
             return back()->withErrors(['matricule' => 'Matricule non trouvé dans le système.'])
-                         ->withInput();
+                ->withInput();
         }
 
         // Vérifier si l'étudiant a déjà évalué
         if ($etudiant->aDejaEvalue()) {
             return back()->withErrors(['matricule' => 'Vous avez déjà effectué votre évaluation pour ce semestre.'])
-                         ->withInput();
+                ->withInput();
         }
 
         // Récupérer les cours actifs de la classe de l'étudiant
@@ -58,7 +58,7 @@ class EvaluationsController extends Controller
 
         if ($cours->isEmpty()) {
             return back()->withErrors(['matricule' => 'Aucun cours actif trouvé pour votre classe.'])
-                         ->withInput();
+                ->withInput();
         }
 
         // Récupérer toutes les questions
@@ -66,7 +66,7 @@ class EvaluationsController extends Controller
 
         if ($questions->isEmpty()) {
             return back()->withErrors(['matricule' => 'Aucune question d\'évaluation configurée.'])
-                         ->withInput();
+                ->withInput();
         }
 
         // Récupérer la classe
@@ -291,36 +291,45 @@ class EvaluationsController extends Controller
      */
     public function getEnseignant(): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
     {
-        $campus_id = Auth::user()->campus_id;
+        $campusId = Auth::user()->campus_id;
 
-        $professeurs = Professeur::whereHas('cours', function($q) use ($campus_id) {
-            $q->where('campus_id', $campus_id)
-                ->where('etat', 1);
-        })
-            ->orderBy('full_name')
-            ->get();
+        // Profs qui ont des cours actifs sur ce campus avec leur note moyenne pré-calculée
+        $profs = Professeur::whereHas('cours', function($q) use ($campusId) {
+            $q->where('campus_id', $campusId)->where('etat', 1);
+        })->orderBy('full_name')->get();
 
-        // Calculer la moyenne pour chaque professeur
-        foreach ($professeurs as $prof) {
-            $coursIds = Cours::where('id_professeur', $prof->id)
-                ->where('campus_id', $campus_id)
-                ->where('etat', 1)
-                ->pluck('id_cours')
-                ->toArray();
+        // Pré-calculer les notes pour tous les profs en une seule requête
+        $coursIds = Cours::where('campus_id', $campusId)
+            ->where('etat', 1)
+            ->pluck('id_cours', 'id_professeur')
+            ->groupBy(fn($item, $key) => $key);
 
-            if (empty($coursIds)) {
-                $prof->moyenne = 0;
-                continue;
-            }
+        // Calculer la moyenne par professeur
+        $notesParProf = DB::table('evaluations')
+            ->join('cours', 'evaluations.id_cours', '=', 'cours.id_cours')
+            ->where('cours.campus_id', $campusId)
+            ->where('cours.etat', 1)
+            ->select('cours.id_professeur', DB::raw('AVG(evaluations.note) as moyenne'))
+            ->groupBy('cours.id_professeur')
+            ->pluck('moyenne', 'id_professeur')
+            ->toArray();
 
-            // Moyenne des notes (note est déjà un entier)
-            $moyenne = Evaluation::whereIn('id_cours', $coursIds)
-                ->avg('note');
-
-            $prof->moyenne = $moyenne ? round($moyenne, 1) : 0;
+        // Ajouter la note à chaque prof
+        foreach ($profs as $prof) {
+            $prof->note_finale = isset($notesParProf[$prof->id])
+                ? round($notesParProf[$prof->id])
+                : 0;
         }
 
-        return view('pages.lists.liste_prof', compact('professeurs'));
+        // Calculer les stats
+        $stats = [
+            'total' => $profs->count(),
+            'tresSatisfaisant' => $profs->where('note_finale', '>=', 85)->count(),
+            'satisfaisant' => $profs->whereBetween('note_finale', [65, 84])->count(),
+            'peuSatisfaisant' => $profs->where('note_finale', '<', 65)->count(),
+        ];
+
+        return view('pages.lists.liste_prof', compact('profs', 'stats'));
     }
 
     /**
@@ -328,8 +337,7 @@ class EvaluationsController extends Controller
      */
     private function cleanMatricule(string $matricule): string
     {
-        // Enlever seulement les tirets et espaces, garder les lettres et chiffres
-        return preg_replace('/[\s\-]/', '', $matricule);
+        return preg_replace('/[^0-9]/', '', $matricule);
     }
 
     /**
@@ -443,7 +451,7 @@ class EvaluationsController extends Controller
     /**
      * Taux de participation par niveau
      */
-    public static function getTauxDeParticipationNiveau($id_niveau): float|int
+    public static function getTauxDeParticipationNiveau($id_niveau)
     {
         $campus_id = Auth::user()->campus_id;
 
@@ -468,6 +476,7 @@ class EvaluationsController extends Controller
 
         return round(($etudiantsEvalue / $totalEtudiants) * 100);
     }
+
     /**
      * Récupérer les commentaires pour un prof/classe/cours
      */

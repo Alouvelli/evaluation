@@ -11,9 +11,10 @@ class Professeur extends Model
     use HasFactory;
 
     protected $table = 'professeurs';
-    
+
     protected $fillable = [
         'full_name',
+        'email',
     ];
 
     /*
@@ -49,5 +50,28 @@ class Professeur extends Model
     public function getMoyenneGeneraleAttribute(): ?float
     {
         return $this->evaluations()->avg('note');
+    }
+
+    /**
+     * Vérifie si le professeur a un email
+     */
+    public function hasEmail(): bool
+    {
+        return !empty($this->email);
+    }
+
+    /**
+     * Obtenir les initiales du professeur
+     */
+    public function getInitialesAttribute(): string
+    {
+        $words = explode(' ', $this->full_name);
+        $initiales = '';
+        foreach ($words as $word) {
+            if (!empty($word)) {
+                $initiales .= strtoupper(substr($word, 0, 1));
+            }
+        }
+        return substr($initiales, 0, 2);
     }
 }

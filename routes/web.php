@@ -191,6 +191,21 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/define-admin/{id}', [UserController::class, 'defineAdmin'])->name('defineAdmin');
     });
 
+    /*
+    |--------------------------------------------------------------------------
+    | Gestion des Mails
+    |--------------------------------------------------------------------------
+    */
+    // Envoyer le rapport par email à un professeur spécifique
+    Route::get('/professeur/{id}/send-rapport', [App\Http\Controllers\ProfesseursController::class, 'sendRapportByEmail'])
+        ->name('send_rapport_prof')
+        ->middleware(['auth']);
+
+// Envoyer les rapports à tous les professeurs ayant un email
+    Route::post('/professeurs/send-all-rapports', [App\Http\Controllers\ProfesseursController::class, 'sendAllRapports'])
+        ->name('send_all_rapports')
+        ->middleware(['auth']);
+
     // Routes legacy
     Route::get('/admin', [UserController::class, 'getAllUser'])->name('admin');
     Route::get('/activer-user/{id}', [UserController::class, 'activerUser'])->name('activerUser');

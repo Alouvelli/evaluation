@@ -4,7 +4,7 @@
 
 @section('content')
     <!-- Stats Cards -->
-    <div class="stats-row">
+    <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-icon primary">
                 <i class="fas fa-chalkboard-teacher"></i>
@@ -50,57 +50,93 @@
         </div>
         <div class="card-body">
             <!-- Tabs Navigation -->
-            <div class="tabs-nav">
+            <div class="tabs-nav" style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
                 <button class="tab-btn active" data-tab="professeurs">
-                    <i class="fas fa-chalkboard-teacher"></i> <span class="tab-text">Professeurs</span>
+                    <i class="fas fa-chalkboard-teacher"></i> Professeurs
                 </button>
                 <button class="tab-btn" data-tab="cours">
-                    <i class="fas fa-book"></i> <span class="tab-text">Cours</span>
+                    <i class="fas fa-book"></i> Cours
                 </button>
                 <button class="tab-btn" data-tab="classes">
-                    <i class="fas fa-users"></i> <span class="tab-text">Classes</span>
+                    <i class="fas fa-users"></i> Classes
                 </button>
                 <button class="tab-btn" data-tab="niveaux">
-                    <i class="fas fa-layer-group"></i> <span class="tab-text">Niveaux</span>
+                    <i class="fas fa-layer-group"></i> Niveaux
                 </button>
                 <button class="tab-btn" data-tab="questions">
-                    <i class="fas fa-question-circle"></i> <span class="tab-text">Questions</span>
+                    <i class="fas fa-question-circle"></i> Questions
                 </button>
             </div>
 
             <!-- Tab: Professeurs -->
             <div class="tab-content active" id="tab-professeurs">
-                <div class="tab-actions">
+                <div style="margin-bottom: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
                     <button class="btn btn-primary" onclick="openModal('modalProfesseur')">
                         <i class="fas fa-plus"></i> Nouveau Professeur
                     </button>
+                    @php
+                        $profsAvecEmail = $professeurs->filter(fn($p) => !empty($p->email))->count();
+                    @endphp
+                    @if($profsAvecEmail > 0)
+                        <form action="{{ route('send_all_rapports') }}" method="POST" style="display: inline;"
+                              onsubmit="return confirm('Envoyer les rapports à tous les {{ $profsAvecEmail }} professeurs ayant un email ?')">
+                            @csrf
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-paper-plane"></i> Envoyer tous les rapports ({{ $profsAvecEmail }})
+                            </button>
+                        </form>
+                    @endif
                 </div>
-                <div class="table-scroll-wrapper">
-                    <table class="table-results datatable">
+                <div class="table-responsive">
+                    <table class="table datatable">
                         <thead>
                         <tr>
                             <th>#</th>
                             <th>Nom complet</th>
-                            <th>Actions</th>
+                            <th>Email</th>
+                            <th style="width: 280px;">Actions</th>
                         </tr>
                         </thead>
                         <tbody>
                         @foreach($professeurs as $prof)
                             <tr>
                                 <td>{{ $prof->id }}</td>
-                                <td><strong>{{ $prof->full_name }}</strong></td>
                                 <td>
-                                    <div class="action-buttons">
-                                        <button class="btn-action btn-edit" onclick="editProfesseur({{ $prof->id }}, '{{ $prof->full_name }}')" title="Modifier">
+                                    <strong>{{ $prof->full_name }}</strong>
+                                </td>
+                                <td>
+                                    @if($prof->email)
+                                        <a href="mailto:{{ $prof->email }}" class="email-link">
+                                            <i class="fas fa-envelope"></i> {{ $prof->email }}
+                                        </a>
+                                    @else
+                                        <span class="text-muted"><i class="fas fa-times-circle"></i> Non renseigné</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-outline" onclick="editProfesseur({{ $prof->id }}, '{{ addslashes($prof->full_name) }}', '{{ $prof->email }}')" title="Modifier">
                                             <i class="fas fa-edit"></i>
                                         </button>
-                                        <a href="{{ route('deleteProfesseur', $prof->id) }}" class="btn-action btn-danger" title="Supprimer"
-                                           onclick="return confirm('Supprimer ce professeur ?')">
+                                        <a href="{{ route('deleteProfesseur', $prof->id) }}" class="btn btn-sm btn-danger"
+                                           onclick="return confirm('Supprimer ce professeur ?')" title="Supprimer">
                                             <i class="fas fa-trash"></i>
                                         </a>
-                                        <a href="{{ route('rapport', $prof->id) }}" class="btn-action btn-pdf" target="_blank" title="Rapport PDF">
+                                        <a href="{{ route('rapport', $prof->id) }}" class="btn btn-sm btn-secondary" target="_blank" title="Télécharger PDF">
                                             <i class="fas fa-file-pdf"></i>
                                         </a>
+                                        @if($prof->email)
+                                            <a href="{{ route('send_rapport_prof', $prof->id) }}"
+                                               class="btn btn-sm btn-success"
+                                               onclick="return confirm('Envoyer le rapport à {{ $prof->email }} ?')"
+                                               title="Envoyer par email">
+                                                <i class="fas fa-paper-plane"></i>
+                                            </a>
+                                        @else
+                                            <button class="btn btn-sm btn-outline" disabled title="Pas d'email">
+                                                <i class="fas fa-paper-plane"></i>
+                                            </button>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>
@@ -112,13 +148,13 @@
 
             <!-- Tab: Cours -->
             <div class="tab-content" id="tab-cours">
-                <div class="tab-actions">
+                <div style="margin-bottom: 1rem;">
                     <button class="btn btn-primary" onclick="openModal('modalCours')">
                         <i class="fas fa-plus"></i> Nouveau Cours
                     </button>
                 </div>
-                <div class="table-scroll-wrapper">
-                    <table class="table-results datatable">
+                <div class="table-responsive">
+                    <table class="table datatable">
                         <thead>
                         <tr>
                             <th>#</th>
@@ -137,24 +173,24 @@
                                 <td><strong>{{ $c->libelle_cours }}</strong></td>
                                 <td>{{ $c->professeur->full_name ?? 'N/A' }}</td>
                                 <td>{{ $c->classe->libelle ?? 'N/A' }}</td>
-                                <td><span class="badge-info">S{{ $c->semestre }}</span></td>
+                                <td>
+                                    <span class="badge badge-info">S{{ $c->semestre }}</span>
+                                </td>
                                 <td>
                                     @if($c->etat == 1)
-                                        <span class="status-badge status-active"><i class="fas fa-check"></i> Actif</span>
+                                        <span class="badge badge-success"><i class="fas fa-check"></i> Actif</span>
                                     @else
-                                        <span class="status-badge status-pending"><i class="fas fa-pause"></i> Inactif</span>
+                                        <span class="badge badge-warning"><i class="fas fa-pause"></i> Inactif</span>
                                     @endif
                                 </td>
                                 <td>
-                                    <div class="action-buttons">
-                                        <a href="{{ route('modifyCours', $c->id_cours) }}" class="btn-action btn-edit" title="Modifier">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <a href="{{ route('deleteCours', $c->id_cours) }}" class="btn-action btn-danger" title="Supprimer"
-                                           onclick="return confirm('Supprimer ce cours ?')">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
-                                    </div>
+                                    <a href="{{ route('modifyCours', $c->id_cours) }}" class="btn btn-sm btn-outline">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{{ route('deleteCours', $c->id_cours) }}" class="btn btn-sm btn-danger"
+                                       onclick="return confirm('Supprimer ce cours ?')">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
                                 </td>
                             </tr>
                         @endforeach
@@ -165,13 +201,13 @@
 
             <!-- Tab: Classes -->
             <div class="tab-content" id="tab-classes">
-                <div class="tab-actions">
+                <div style="margin-bottom: 1rem;">
                     <button class="btn btn-primary" onclick="openModal('modalClasse')">
                         <i class="fas fa-plus"></i> Nouvelle Classe
                     </button>
                 </div>
-                <div class="table-scroll-wrapper">
-                    <table class="table-results datatable">
+                <div class="table-responsive">
+                    <table class="table datatable">
                         <thead>
                         <tr>
                             <th>#</th>
@@ -186,30 +222,25 @@
                             <tr>
                                 <td>{{ $classe->id }}</td>
                                 <td><strong>{{ $classe->libelle }}</strong></td>
-                                <td><span class="badge-primary">{{ $classe->niveau->libelle_niveau ?? 'N/A' }}</span></td>
+                                <td>
+                                    <span class="badge badge-primary">{{ $classe->niveau->libelle_niveau ?? 'N/A' }}</span>
+                                </td>
                                 <td>
                                     @php
                                         $nbEtudiants = \App\Models\Etudiant::where('id_classe', $classe->id)->count();
                                     @endphp
-                                    <span class="badge-count-inline {{ $nbEtudiants > 0 ? 'success' : 'warning' }}">
+                                    <span class="badge {{ $nbEtudiants > 0 ? 'badge-success' : 'badge-warning' }}">
                                         {{ $nbEtudiants }} étudiant(s)
                                     </span>
                                 </td>
                                 <td>
-                                    <div class="action-buttons">
-                                        <button class="btn-action btn-edit" onclick="editClasse({{ $classe->id }}, '{{ $classe->libelle }}', {{ $classe->id_niveau }})" title="Modifier">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <a href="{{ route('deleteClasse', $classe->id) }}" class="btn-action btn-danger" title="Supprimer"
-                                           onclick="return confirm('Supprimer cette classe ?')">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
-                                        @if($nbEtudiants > 0)
-                                            <a href="{{ route('etudiants.byClasse', $classe->id) }}" class="btn-action btn-view" title="Voir étudiants">
-                                                <i class="fas fa-users"></i>
-                                            </a>
-                                        @endif
-                                    </div>
+                                    <button class="btn btn-sm btn-outline" onclick="editClasse({{ $classe->id }}, '{{ $classe->libelle }}', {{ $classe->id_niveau }})">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <a href="{{ route('deleteClasse', $classe->id) }}" class="btn btn-sm btn-danger"
+                                       onclick="return confirm('Supprimer cette classe ?')">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
                                 </td>
                             </tr>
                         @endforeach
@@ -220,13 +251,13 @@
 
             <!-- Tab: Niveaux -->
             <div class="tab-content" id="tab-niveaux">
-                <div class="tab-actions">
+                <div style="margin-bottom: 1rem;">
                     <button class="btn btn-primary" onclick="openModal('modalNiveau')">
                         <i class="fas fa-plus"></i> Nouveau Niveau
                     </button>
                 </div>
-                <div class="table-scroll-wrapper">
-                    <table class="table-results datatable">
+                <div class="table-responsive">
+                    <table class="table datatable">
                         <thead>
                         <tr>
                             <th>#</th>
@@ -244,18 +275,16 @@
                                     @php
                                         $nbClasses = \App\Models\Classes::where('id_niveau', $niveau->id_niveau)->count();
                                     @endphp
-                                    <span class="badge-info">{{ $nbClasses }} classe(s)</span>
+                                    <span class="badge badge-primary">{{ $nbClasses }} classe(s)</span>
                                 </td>
                                 <td>
-                                    <div class="action-buttons">
-                                        <button class="btn-action btn-edit" onclick="editNiveau({{ $niveau->id_niveau }}, '{{ $niveau->libelle_niveau }}')" title="Modifier">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <a href="{{ route('deleteNiveau', $niveau->id_niveau) }}" class="btn-action btn-danger" title="Supprimer"
-                                           onclick="return confirm('Supprimer ce niveau ?')">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
-                                    </div>
+                                    <button class="btn btn-sm btn-outline" onclick="editNiveau({{ $niveau->id_niveau }}, '{{ $niveau->libelle_niveau }}')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <a href="{{ route('deleteNiveau', $niveau->id_niveau) }}" class="btn btn-sm btn-danger"
+                                       onclick="return confirm('Supprimer ce niveau ?')">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
                                 </td>
                             </tr>
                         @endforeach
@@ -266,35 +295,29 @@
 
             <!-- Tab: Questions -->
             <div class="tab-content" id="tab-questions">
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i>
-                    <div>Les questions sont utilisées dans le formulaire d'évaluation. Modifier avec précaution.</div>
+                <div style="margin-bottom: 1rem;">
+                    <button class="btn btn-primary" onclick="openModal('modalQuestion')">
+                        <i class="fas fa-plus"></i> Nouvelle Question
+                    </button>
                 </div>
-                <div class="table-scroll-wrapper">
-                    <table class="table-results">
+                <div class="table-responsive">
+                    <table class="table datatable">
                         <thead>
                         <tr>
-                            <th style="width: 80px;">#</th>
+                            <th>N°</th>
                             <th>Question</th>
-                            <th style="width: 100px;">Actions</th>
+                            <th>Actions</th>
                         </tr>
                         </thead>
                         <tbody>
                         @foreach($questions as $q)
                             <tr>
-                                <td><span class="badge-primary">Q{{ $q->idQ }}</span></td>
                                 <td>
-                                    <form action="{{ route('modifyQuestion') }}" method="POST" class="question-form">
-                                        @csrf
-                                        <input type="hidden" name="idQ" value="{{ $q->idQ }}">
-                                        <textarea name="libelle" rows="2" class="form-textarea">{{ $q->libelle }}</textarea>
-                                        <button type="submit" class="btn-action btn-save" title="Enregistrer">
-                                            <i class="fas fa-save"></i>
-                                        </button>
-                                    </form>
+                                    <span class="badge badge-primary">Q{{ $q->idQ }}</span>
                                 </td>
+                                <td>{{ $q->libelle }}</td>
                                 <td>
-                                    <a href="{{ route('deleteQuestion', $q->idQ) }}" class="btn-action btn-danger disabled" title="Supprimer"
+                                    <a href="{{ route('deleteQuestion', $q->idQ) }}" class="btn btn-sm btn-danger"
                                        onclick="return confirm('Supprimer cette question ?')">
                                         <i class="fas fa-trash"></i>
                                     </a>
@@ -319,8 +342,13 @@
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">
-                        <label class="form-label">Nom complet <span class="required">*</span></label>
-                        <input type="text" name="professeur" class="form-input" placeholder="Ex: Dr. Amadou DIALLO" required>
+                        <label class="form-label">Nom complet <span style="color: var(--danger);">*</span></label>
+                        <input type="text" name="professeur" class="form-control" placeholder="Ex: Dr. Amadou DIALLO" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" class="form-control" placeholder="Ex: amadou.diallo@isi.edu.sn">
+                        <small class="text-muted">L'email permet d'envoyer le rapport directement au professeur</small>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -343,8 +371,13 @@
                 <input type="hidden" name="id" id="editProfId">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label class="form-label">Nom complet</label>
-                        <input type="text" name="professeur" id="editProfName" class="form-input" required>
+                        <label class="form-label">Nom complet <span style="color: var(--danger);">*</span></label>
+                        <input type="text" name="professeur" id="editProfName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" id="editProfEmail" class="form-control" placeholder="Ex: professeur@isi.edu.sn">
+                        <small class="text-muted">L'email permet d'envoyer le rapport directement au professeur</small>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -366,12 +399,12 @@
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">
-                        <label class="form-label">Libellé du cours <span class="required">*</span></label>
-                        <input type="text" name="libelle_cours" class="form-input" placeholder="Ex: Algorithmique" required>
+                        <label class="form-label">Libellé du cours <span style="color: var(--danger);">*</span></label>
+                        <input type="text" name="libelle_cours" class="form-control" placeholder="Ex: Algorithmique" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Professeur <span class="required">*</span></label>
-                        <select name="id_professeur" class="form-select" required>
+                        <label class="form-label">Professeur <span style="color: var(--danger);">*</span></label>
+                        <select name="id_professeur" class="form-control form-select" required>
                             <option value="">-- Sélectionner --</option>
                             @foreach($professeurs as $prof)
                                 <option value="{{ $prof->id }}">{{ $prof->full_name }}</option>
@@ -379,8 +412,8 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Classe <span class="required">*</span></label>
-                        <select name="id_classe" class="form-select" required>
+                        <label class="form-label">Classe <span style="color: var(--danger);">*</span></label>
+                        <select name="id_classe" class="form-control form-select" required>
                             <option value="">-- Sélectionner --</option>
                             @foreach($classes as $classe)
                                 <option value="{{ $classe->id }}">{{ $classe->niveau->libelle_niveau ?? '' }} - {{ $classe->libelle }}</option>
@@ -388,8 +421,8 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Année académique <span class="required">*</span></label>
-                        <select name="annee_id" class="form-select" required>
+                        <label class="form-label">Année académique <span style="color: var(--danger);">*</span></label>
+                        <select name="annee_id" class="form-control form-select" required>
                             <option value="">-- Sélectionner --</option>
                             @foreach($annees as $an)
                                 <option value="{{ $an->id }}">{{ $an->annee1 }} - {{ $an->annee2 }}</option>
@@ -397,8 +430,8 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Semestre <span class="required">*</span></label>
-                        <select name="semestre" class="form-select" required>
+                        <label class="form-label">Semestre <span style="color: var(--danger);">*</span></label>
+                        <select name="semestre" class="form-control form-select" required>
                             <option value="1">Semestre 1</option>
                             <option value="2">Semestre 2</option>
                         </select>
@@ -423,12 +456,12 @@
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">
-                        <label class="form-label">Libellé <span class="required">*</span></label>
-                        <input type="text" name="classe" class="form-input" placeholder="Ex: GL-A" required>
+                        <label class="form-label">Libellé <span style="color: var(--danger);">*</span></label>
+                        <input type="text" name="classe" class="form-control" placeholder="Ex: GL-A" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Niveau <span class="required">*</span></label>
-                        <select name="niveau_id" class="form-select" required>
+                        <label class="form-label">Niveau <span style="color: var(--danger);">*</span></label>
+                        <select name="niveau_id" class="form-control form-select" required>
                             <option value="">-- Sélectionner --</option>
                             @foreach($niveaux as $niveau)
                                 <option value="{{ $niveau->id_niveau }}">{{ $niveau->libelle_niveau }}</option>
@@ -457,11 +490,11 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label class="form-label">Libellé</label>
-                        <input type="text" name="classe" id="editClasseLibelle" class="form-input" required>
+                        <input type="text" name="classe" id="editClasseLibelle" class="form-control" required>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Niveau</label>
-                        <select name="niveau_id" id="editClasseNiveau" class="form-select" required>
+                        <select name="niveau_id" id="editClasseNiveau" class="form-control form-select" required>
                             @foreach($niveaux as $niveau)
                                 <option value="{{ $niveau->id_niveau }}">{{ $niveau->libelle_niveau }}</option>
                             @endforeach
@@ -487,8 +520,8 @@
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">
-                        <label class="form-label">Libellé <span class="required">*</span></label>
-                        <input type="text" name="niveau" class="form-input" placeholder="Ex: Licence 1" required>
+                        <label class="form-label">Libellé <span style="color: var(--danger);">*</span></label>
+                        <input type="text" name="niveau" class="form-control" placeholder="Ex: Licence 1" required>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -512,7 +545,7 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label class="form-label">Libellé</label>
-                        <input type="text" name="niveau" id="editNiveauLibelle" class="form-input" required>
+                        <input type="text" name="niveau" id="editNiveauLibelle" class="form-control" required>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -522,15 +555,133 @@
             </form>
         </div>
     </div>
+
+    <!-- Modal: Nouvelle Question -->
+    <div class="modal-overlay" id="modalQuestion">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5><i class="fas fa-question-circle"></i> Nouvelle Question</h5>
+                <button class="modal-close" onclick="closeModal('modalQuestion')">&times;</button>
+            </div>
+            <form action="{{ route('newQuestion') }}" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Question <span style="color: var(--danger);">*</span></label>
+                        <textarea name="question" class="form-control" rows="3" placeholder="Ex: L'enseignant maîtrise-t-il sa matière ?" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modalQuestion')">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
 @endsection
+
+@push('styles')
+    <style>
+        .tabs-nav {
+            border-bottom: 2px solid var(--gray-light);
+            padding-bottom: 0.5rem;
+        }
+
+        .tab-btn {
+            padding: 0.75rem 1.25rem;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-weight: 500;
+            color: var(--gray);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tab-btn:hover {
+            background: var(--light);
+            color: var(--primary);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 0.25rem;
+            flex-wrap: wrap;
+        }
+
+        .email-link {
+            color: var(--primary);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.85rem;
+        }
+
+        .email-link:hover {
+            text-decoration: underline;
+        }
+
+        .text-muted {
+            color: var(--gray);
+            font-size: 0.8rem;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: none;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: white;
+        }
+
+        small.text-muted {
+            display: block;
+            margin-top: 0.25rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+@endpush
 
 @push('scripts')
     <script>
         // Tabs Management
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
+                // Remove active from all
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+                // Add active to clicked
                 btn.classList.add('active');
                 document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
             });
@@ -545,6 +696,7 @@
             document.getElementById(id).classList.remove('show');
         }
 
+        // Close modal on overlay click
         document.querySelectorAll('.modal-overlay').forEach(modal => {
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) {
@@ -554,9 +706,10 @@
         });
 
         // Edit Functions
-        function editProfesseur(id, name) {
+        function editProfesseur(id, name, email) {
             document.getElementById('editProfId').value = id;
             document.getElementById('editProfName').value = name;
+            document.getElementById('editProfEmail').value = email || '';
             openModal('modalEditProfesseur');
         }
 

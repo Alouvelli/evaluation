@@ -73,8 +73,8 @@
         }
         .note-finale {
             text-align: center;
-            margin: 20mm 0;
-            padding: 20px;
+            margin: 15mm 0;
+            padding: 15px;
             background: #f8fafc;
             border: 2px solid #667eea;
         }
@@ -88,9 +88,53 @@
             font-size: 12pt;
         }
 
+        /* Légende */
+        .legend-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 10px 15px;
+            margin-bottom: 8mm;
+        }
+        .legend-title {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 11pt;
+        }
+        .legend-items {
+            display: table;
+            width: 100%;
+        }
+        .legend-item {
+            display: table-cell;
+            width: 33.33%;
+            padding: 5px 0;
+        }
+        .legend-color {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            vertical-align: middle;
+            margin-right: 5px;
+        }
+        .legend-color-danger { background: #ef4444; }
+        .legend-color-warning { background: #f59e0b; }
+        .legend-color-success { background: #10b981; }
+        .legend-text {
+            font-size: 10pt;
+            color: #374151;
+        }
+        .legend-range {
+            font-size: 9pt;
+            color: #64748b;
+            font-weight: bold;
+        }
+
         /* Sections */
         .section {
-            margin-top: 10mm;
+            margin-top: 8mm;
         }
         .section-title {
             background: #667eea;
@@ -179,16 +223,44 @@
 {{-- NOTE FINALE - Nouvelle page --}}
 <div class="note-finale-section">
     <div class="note-finale">
-        <h2 style="color: {{ $noteFinale < 50 ? '#ef4444' : ($noteFinale <= 75 ? '#f59e0b' : '#10b981') }};">{{ $noteFinale }}/100</h2>
-        <p>Note Finale -
-            @if($noteFinale < 50)
-                <span style="color: #ef4444;">Insuffisant</span>
-            @elseif($noteFinale <= 75)
-                <span style="color: #f59e0b;">Acceptable</span>
-            @else
-                <span style="color: #10b981;">Satisfaisant</span>
-            @endif
-        </p>
+        @php
+            if($noteFinale < 65) {
+                $noteColor = '#ef4444';
+                $noteLabel = 'Peu satisfaisant';
+            } elseif($noteFinale <= 85) {
+                $noteColor = '#f59e0b';
+                $noteLabel = 'Satisfaisant';
+            } else {
+                $noteColor = '#10b981';
+                $noteLabel = 'Très satisfaisant';
+            }
+        @endphp
+        <h2 style="color: {{ $noteColor }};">{{ $noteFinale }}/100</h2>
+        <p>Note Finale - <span style="color: {{ $noteColor }}; font-weight: bold;">{{ $noteLabel }}</span></p>
+    </div>
+
+    {{-- LÉGENDE --}}
+    <div class="legend-box">
+        <div class="legend-title">Légende des notes</div>
+        <table style="border: none;">
+            <tr>
+                <td style="border: none; text-align: left; padding: 5px 10px;">
+                    <span class="legend-color legend-color-danger"></span>
+                    <span class="legend-text">Peu satisfaisant</span>
+                    <span class="legend-range">(&lt; 65%)</span>
+                </td>
+                <td style="border: none; text-align: center; padding: 5px 10px;">
+                    <span class="legend-color legend-color-warning"></span>
+                    <span class="legend-text">Satisfaisant</span>
+                    <span class="legend-range">(65% - 85%)</span>
+                </td>
+                <td style="border: none; text-align: right; padding: 5px 10px;">
+                    <span class="legend-color legend-color-success"></span>
+                    <span class="legend-text">Très satisfaisant</span>
+                    <span class="legend-range">(&gt; 85%)</span>
+                </td>
+            </tr>
+        </table>
     </div>
 
     {{-- RÉSULTATS PAR COURS --}}
@@ -215,8 +287,8 @@
                         @php
                             $cellClass = '';
                             if($note > 0) {
-                                if($note >= 75) $cellClass = 'cell-good';
-                                elseif($note >= 50) $cellClass = 'cell-warning';
+                                if($note > 85) $cellClass = 'cell-good';
+                                elseif($note >= 65) $cellClass = 'cell-warning';
                                 else $cellClass = 'cell-danger';
                             }
                         @endphp
@@ -224,8 +296,8 @@
                     @endforeach
                     @php
                         $moyClass = '';
-                        if($c['moyenne'] >= 75) $moyClass = 'cell-good';
-                        elseif($c['moyenne'] >= 50) $moyClass = 'cell-warning';
+                        if($c['moyenne'] > 85) $moyClass = 'cell-good';
+                        elseif($c['moyenne'] >= 65) $moyClass = 'cell-warning';
                         else $moyClass = 'cell-danger';
                     @endphp
                     <td class="{{ $moyClass }}">{{ $c['moyenne'] }}%</td>
