@@ -422,13 +422,21 @@ class EvaluationsController extends Controller
     }
 
     /**
-     * Note finale d'un professeur (moyenne générale)
+     * Note finale d'un professeur (moyenne générale des cours actifs)
      */
-    public static function getNoteFinale($idProf): int
+    public static function getNoteFinale($idProf, $campusId = null): int
     {
+        // Si pas de campus fourni, prendre celui de l'utilisateur connecté
+        if ($campusId === null) {
+            $campusId = Auth::user()->campus_id ?? 1;
+        }
+
         $result = DB::table('evaluations')
-            ->where('id_professeur', $idProf)
-            ->avg('note');
+            ->join('cours', 'evaluations.id_cours', '=', 'cours.id_cours')
+            ->where('evaluations.id_professeur', $idProf)
+            ->where('cours.campus_id', $campusId)
+            ->where('cours.etat', 1)
+            ->avg('evaluations.note');
 
         return $result ? (int) round($result) : 0;
     }
