@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\AnneeAcademique;
 use App\Models\Classes;
-use App\Models\Commentaire;
 use App\Models\Cours;
 use App\Models\Evaluation;
 use App\Models\Niveau;
@@ -12,10 +11,9 @@ use App\Models\Professeur;
 use App\Models\Question;
 use App\Mail\RapportProfesseurMail;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Str;
 
@@ -33,11 +31,12 @@ class ProfesseursController extends Controller
             'professeurs' => Professeur::orderBy('full_name')->get(),
             'questions' => Question::orderBy('idQ')->get(),
             'niveaux' => Niveau::all(),
-            'classes' => Classes::where('campus_id', $campus_id)->get(),
-            'annees' => AnneeAcademique::all(),
-            'cours' => Cours::whereHas('classe', function($q) use ($campus_id) {
-                $q->where('campus_id', $campus_id);
-            })->get(),
+            'classes' => Classes::where('campus_id', $campus_id)->with('niveau')->get(),
+            'annees' => AnneeAcademique::orderByDesc('annee1')->get(),
+            'cours' => Cours::where('campus_id', $campus_id)
+                ->with(['professeur', 'classe.niveau'])
+                ->orderByDesc('id_cours')
+                ->get(),
         ]);
     }
 
@@ -61,28 +60,39 @@ class ProfesseursController extends Controller
     /**
      * Supprime un professeur
      */
-    public function delete($id)
+    public function delete($id): \Illuminate\Http\RedirectResponse
     {
         $professeur = Professeur::findOrFail($id);
 
         if ($professeur->cours()->exists()) {
-            return back()->withStatus('Impossible, ce professeur intervient dans un cours !');
+            return redirect()->route('tools')
+                ->with('status', 'Impossible de supprimer ce professeur car il intervient dans un ou plusieurs cours.')
+                ->with('redirect_tab', 'professeurs');
         }
 
         $professeur->delete();
 
-        return back()->withStatus('Professeur supprimé avec succès');
+        return redirect()->route('tools')
+            ->with('status', 'Professeur supprimé avec succès.')
+            ->with('redirect_tab', 'professeurs');
     }
 
     /**
      * Modifie un professeur
      */
-    public function modify(Request $request)
+    public function modify(Request $request): \Illuminate\Http\RedirectResponse
     {
         $request->validate([
             'id' => 'required|exists:professeurs,id',
             'professeur' => 'required|string|max:255',
-            'email' => 'nullable|email|max:255',
+            'email' => ['nullable', 'email', 'max:255', 'regex:/^[a-zA-Z0-9._%+-]+@groupeisi\.com$/i'],
+        ], [
+            'id.required' => 'L\'identifiant du professeur est requis.',
+            'id.exists' => 'Ce professeur n\'existe pas.',
+            'professeur.required' => 'Le nom du professeur est obligatoire.',
+            'professeur.max' => 'Le nom ne peut pas dépasser 255 caractères.',
+            'email.email' => 'L\'adresse email n\'est pas valide.',
+            'email.regex' => 'Seuls les emails @groupeisi.com sont autorisés.',
         ]);
 
         Professeur::where('id', $request->id)->update([
@@ -90,23 +100,32 @@ class ProfesseursController extends Controller
             'email' => $request->email,
         ]);
 
-        return back()->withStatus('Professeur modifié avec succès');
+        return redirect()->route('tools')
+            ->with('status', 'Professeur modifié avec succès.')
+            ->with('redirect_tab', $request->redirect_tab ?? 'professeurs');
     }
 
     /**
      * Crée un nouveau professeur
      */
-    public function store(Request $request)
+    public function store(Request $request): \Illuminate\Http\RedirectResponse
     {
         $request->validate([
             'professeur' => 'required|string|max:255',
-            'email' => 'nullable|email|max:255',
+            'email' => ['nullable', 'email', 'max:255', 'regex:/^[a-zA-Z0-9._%+-]+@groupeisi\.com$/i'],
+        ], [
+            'professeur.required' => 'Le nom du professeur est obligatoire.',
+            'professeur.max' => 'Le nom ne peut pas dépasser 255 caractères.',
+            'email.email' => 'L\'adresse email n\'est pas valide.',
+            'email.regex' => 'Seuls les emails @groupeisi.com sont autorisés.',
         ]);
 
         $exists = Professeur::where('full_name', $request->professeur)->exists();
 
         if ($exists) {
-            return back()->withStatus('Ce professeur existe déjà');
+            return redirect()->route('tools')
+                ->with('status', 'Erreur : Ce professeur existe déjà dans la base de données.')
+                ->with('redirect_tab', $request->redirect_tab ?? 'professeurs');
         }
 
         Professeur::create([
@@ -114,7 +133,9 @@ class ProfesseursController extends Controller
             'email' => $request->email,
         ]);
 
-        return back()->withStatus('Professeur ajouté avec succès');
+        return redirect()->route('tools')
+            ->with('status', 'Professeur ajouté avec succès.')
+            ->with('redirect_tab', $request->redirect_tab ?? 'professeurs');
     }
 
     /**
@@ -134,36 +155,29 @@ class ProfesseursController extends Controller
     /**
      * Envoyer le rapport par email au professeur
      */
-    public function sendRapportByEmail($id)
+    public function sendRapportByEmail($id): \Illuminate\Http\RedirectResponse
     {
         $prof = Professeur::findOrFail($id);
 
-        // Vérifier si le professeur a un email
         if (empty($prof->email)) {
-            return back()->withStatus('Erreur : Ce professeur n\'a pas d\'adresse email configurée.');
+            return back()->with('status', 'Erreur : Ce professeur n\'a pas d\'adresse email configurée.');
         }
 
         try {
-            // Générer les données du rapport
             $pdfData = $this->generateRapportData($prof);
 
-            // Générer le PDF
             $pdf = Pdf::loadView('pdf.rapport-prof', $pdfData);
             $pdf->setPaper('A4', 'portrait');
 
-            // Sauvegarder temporairement le PDF
             $fileName = 'rapport_' . Str::slug($prof->full_name) . '_' . time() . '.pdf';
             $tempPath = storage_path('app/temp/' . $fileName);
 
-            // Créer le dossier temp s'il n'existe pas
             if (!file_exists(storage_path('app/temp'))) {
                 mkdir(storage_path('app/temp'), 0755, true);
             }
 
-            // Sauvegarder le PDF
             file_put_contents($tempPath, $pdf->output());
 
-            // Envoyer l'email
             Mail::to($prof->email)->send(new RapportProfesseurMail(
                 $prof,
                 $pdfData['noteFinale'],
@@ -172,26 +186,25 @@ class ProfesseursController extends Controller
                 $tempPath
             ));
 
-            // Supprimer le fichier temporaire
             if (file_exists($tempPath)) {
                 unlink($tempPath);
             }
 
-            return back()->withStatus('Rapport envoyé avec succès à ' . $prof->email);
+            return back()->with('status', 'Rapport envoyé avec succès à ' . $prof->email);
 
         } catch (\Exception $e) {
-            return back()->withStatus('Erreur lors de l\'envoi : ' . $e->getMessage());
+            Log::error('Erreur envoi rapport professeur: ' . $e->getMessage());
+            return back()->with('status', 'Erreur lors de l\'envoi du rapport : ' . $e->getMessage());
         }
     }
 
     /**
      * Envoyer les rapports à tous les professeurs ayant un email
      */
-    public function sendAllRapports()
+    public function sendAllRapports(): \Illuminate\Http\RedirectResponse
     {
         $campusId = Auth::user()->campus_id;
 
-        // Professeurs avec email et ayant des cours actifs
         $professeurs = Professeur::whereNotNull('email')
             ->where('email', '!=', '')
             ->whereHas('cours', function($q) use ($campusId) {
@@ -200,7 +213,7 @@ class ProfesseursController extends Controller
             ->get();
 
         if ($professeurs->isEmpty()) {
-            return back()->withStatus('Aucun professeur avec email n\'a de cours actif.');
+            return back()->with('status', 'Aucun professeur avec email n\'a de cours actif pour cette période.');
         }
 
         $sent = 0;
@@ -237,16 +250,16 @@ class ProfesseursController extends Controller
                 $sent++;
             } catch (\Exception $e) {
                 $errors++;
-                \Log::error('Erreur envoi rapport à ' . $prof->email . ': ' . $e->getMessage());
+                Log::error('Erreur envoi rapport à ' . $prof->email . ': ' . $e->getMessage());
             }
         }
 
         $message = "$sent rapport(s) envoyé(s) avec succès.";
         if ($errors > 0) {
-            $message .= " $errors erreur(s) d'envoi.";
+            $message .= " $errors erreur(s) lors de l'envoi.";
         }
 
-        return back()->withStatus($message);
+        return back()->with('status', $message);
     }
 
     /**
@@ -256,20 +269,16 @@ class ProfesseursController extends Controller
     {
         $campusId = Auth::user()->campus_id;
 
-        // Cours du professeur
         $coursQuery = Cours::where('id_professeur', $prof->id)
             ->where('campus_id', $campusId)
             ->where('etat', 1)
             ->with(['classe.niveau'])
             ->get();
 
-        // Questions
         $questions = Question::orderBy('idQ')->get();
 
-        // Note finale
         $noteFinale = EvaluationsController::getNoteFinale($prof->id);
 
-        // Appréciation, objet et avertissement selon la note
         if ($noteFinale < 65) {
             $appreciation = 'peu satisfaisant';
             $objet = 'Informations';
@@ -284,12 +293,10 @@ class ProfesseursController extends Controller
             $avertissement = 'témoignant de la qualité de vos prestations.';
         }
 
-        // Semestre
         $evalInfo = CoursController::getEvaluationForRapportProf();
         $semestre = $evalInfo->semestre ?? '1';
         $adjectifSemestre = ($semestre == '1') ? 'premier' : 'second';
 
-        // Données par cours
         $cours = [];
         foreach ($coursQuery as $c) {
             $notes = [];

@@ -13,7 +13,7 @@ class ClassesController extends Controller
     /**
      * Liste les classes pour une année/semestre
      */
-    public function getListeClasse($annee, $semestre)
+    public function getListeClasse($annee, $semestre): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse
     {
         $campusId = Auth::user()->campus_id;
 
@@ -48,7 +48,7 @@ class ClassesController extends Controller
             ->get();
 
         if ($classes->isEmpty()) {
-            return back()->withStatus('Impossible, aucun cours trouvé !');
+            return back()->with('status', 'Aucun cours trouvé pour cette période.');
         }
 
         return view('pages.lists.liste-classe', compact('classes'));
@@ -57,7 +57,7 @@ class ClassesController extends Controller
     /**
      * Formulaire d'édition d'une classe
      */
-    public function edit($id)
+    public function edit($id): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
     {
         $classes = Classes::with('niveau')->findOrFail($id);
         $niveaux = Niveau::all();
@@ -68,33 +68,44 @@ class ClassesController extends Controller
     /**
      * Supprime une classe
      */
-    public function delete($id)
+    public function delete($id): \Illuminate\Http\RedirectResponse
     {
         $classe = Classes::findOrFail($id);
 
         // Vérifier qu'aucun cours n'est lié
         if ($classe->cours()->exists()) {
-            return back()->withStatus('Impossible, cette classe a un cours !');
+            return redirect()->route('tools')
+                ->with('status', 'Impossible de supprimer cette classe car elle est associée à un ou plusieurs cours.')
+                ->with('redirect_tab', 'classes');
         }
 
         // Vérifier qu'aucun étudiant n'est lié
         if ($classe->etudiants()->exists()) {
-            return back()->withStatus('Impossible, cette classe contient des étudiants !');
+            return redirect()->route('tools')
+                ->with('status', 'Impossible de supprimer cette classe car elle contient des étudiants.')
+                ->with('redirect_tab', 'classes');
         }
 
         $classe->delete();
 
-        return back()->withStatus('Classe supprimée avec succès');
+        return redirect()->route('tools')
+            ->with('status', 'Classe supprimée avec succès.')
+            ->with('redirect_tab', 'classes');
     }
 
     /**
      * Crée une nouvelle classe
      */
-    public function store(Request $request)
+    public function store(Request $request): \Illuminate\Http\RedirectResponse
     {
         $request->validate([
             'classe' => 'required|string|max:255',
             'niveau_id' => 'required|exists:niveaux,id_niveau',
+        ], [
+            'classe.required' => 'Le libellé de la classe est obligatoire.',
+            'classe.max' => 'Le libellé ne peut pas dépasser 255 caractères.',
+            'niveau_id.required' => 'Veuillez sélectionner un niveau.',
+            'niveau_id.exists' => 'Le niveau sélectionné n\'existe pas.',
         ]);
 
         $campusId = Auth::user()->campus_id;
@@ -106,7 +117,9 @@ class ClassesController extends Controller
             ->exists();
 
         if ($exists) {
-            return back()->withStatus('Cette classe existe déjà !');
+            return redirect()->route('tools')
+                ->with('status', 'Erreur : Cette classe existe déjà pour ce niveau.')
+                ->with('redirect_tab', 'classes');
         }
 
         Classes::create([
@@ -115,23 +128,36 @@ class ClassesController extends Controller
             'campus_id' => $campusId,
         ]);
 
-        return back()->withStatus('Classe ajoutée avec succès');
+        return redirect()->route('tools')
+            ->with('status', 'Classe ajoutée avec succès.')
+            ->with('redirect_tab', $request->redirect_tab ?? 'classes');
     }
 
     /**
      * Met à jour une classe
      */
-    public function update(Request $request)
+    public function update(Request $request): \Illuminate\Http\RedirectResponse
     {
         $request->validate([
             'id' => 'required|exists:classes,id',
             'classe' => 'required|string|max:255',
+            'niveau_id' => 'required|exists:niveaux,id_niveau',
+        ], [
+            'id.required' => 'L\'identifiant de la classe est requis.',
+            'id.exists' => 'Cette classe n\'existe pas.',
+            'classe.required' => 'Le libellé de la classe est obligatoire.',
+            'niveau_id.required' => 'Veuillez sélectionner un niveau.',
         ]);
 
         $classe = Classes::findOrFail($request->id);
-        $classe->update(['libelle' => $request->classe]);
+        $classe->update([
+            'libelle' => $request->classe,
+            'id_niveau' => $request->niveau_id,
+        ]);
 
-        return back()->withStatus('Classe modifiée avec succès');
+        return redirect()->route('tools')
+            ->with('status', 'Classe modifiée avec succès.')
+            ->with('redirect_tab', $request->redirect_tab ?? 'classes');
     }
 
     /*
@@ -161,7 +187,7 @@ class ClassesController extends Controller
     /**
      * Liste toutes les classes du campus de l'utilisateur
      */
-    public static function getListClasse()
+    public static function getListClasse(): \Illuminate\Database\Eloquent\Collection
     {
         return Classes::with('niveau')
             ->where('campus_id', Auth::user()->campus_id)
