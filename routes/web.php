@@ -212,3 +212,4 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/delete-user/{id}', [UserController::class, 'deleteUser'])->name('deleteUser');
     Route::get('/define-admin/{id}', [UserController::class, 'defineAdmin'])->name('defineAdmin');
 });
+require __DIR__.'/super-admin.php';

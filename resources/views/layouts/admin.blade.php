@@ -62,7 +62,7 @@
             position: fixed;
             left: 0;
             top: 0;
-            width: var(--sidebar-width);
+            width: 280px;
             height: 100vh;
             background: var(--gradient-primary);
             z-index: 1000;
@@ -257,56 +257,11 @@
             display: none;
         }
 
-        /* Sidebar Footer */
-        .sidebar-footer {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 1rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(0, 0, 0, 0.1);
-        }
-
-        .sidebar-collapse-btn {
-            width: 100%;
-            padding: 0.75rem;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            border-radius: 10px;
-            color: rgba(255, 255, 255, 0.8);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            font-size: 0.85rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .sidebar-collapse-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-        }
-
-        .sidebar-collapse-btn i {
-            transition: transform 0.3s ease;
-        }
-
-        .sidebar.collapsed .sidebar-collapse-btn i {
-            transform: rotate(180deg);
-        }
-
-        .sidebar.collapsed .sidebar-collapse-btn span {
-            display: none;
-        }
-
         /* ========================================
            MAIN CONTENT
            ======================================== */
         .main-content {
-            margin-left: var(--sidebar-width);
+            margin-left: 280px;
             min-height: 100vh;
             transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -319,7 +274,7 @@
            NAVBAR - Glassmorphism Style
            ======================================== */
         .main-header {
-            height: var(--header-height);
+            height: 70px;
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
@@ -431,6 +386,118 @@
         .header-campus strong {
             color: var(--primary);
             font-weight: 600;
+        }
+
+        /* ========================================
+           CAMPUS SELECTOR (Super Admin)
+           ======================================== */
+        .campus-selector {
+            position: relative;
+        }
+
+        .campus-selector-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+        }
+
+        .campus-selector-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+        }
+
+        .campus-selector-btn i.fa-chevron-down {
+            font-size: 0.7rem;
+            transition: transform 0.2s;
+        }
+
+        .campus-selector-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            min-width: 240px;
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+            z-index: 1001;
+            overflow: hidden;
+        }
+
+        .campus-selector-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .campus-selector-header {
+            padding: 0.75rem 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .campus-selector-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            width: 100%;
+            padding: 0.7rem 1rem;
+            background: none;
+            border: none;
+            color: #374151;
+            font-family: inherit;
+            font-size: 0.85rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-decoration: none;
+        }
+
+        .campus-selector-item:hover {
+            background: #f1f5f9;
+            color: #667eea;
+        }
+
+        .campus-selector-item.active {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .campus-selector-item i {
+            width: 18px;
+            text-align: center;
+            opacity: 0.7;
+        }
+
+        .campus-selector-divider {
+            height: 1px;
+            background: #e2e8f0;
+            margin: 0.25rem 0;
+        }
+
+        .campus-selector-link {
+            color: #667eea;
+            font-weight: 500;
         }
 
         /* User Dropdown */
@@ -588,6 +655,12 @@
             color: #1e40af;
         }
 
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: #92400e;
+        }
+
         /* Cards */
         .card {
             background: var(--glass-bg);
@@ -623,6 +696,7 @@
         .card-body {
             padding: 1.5rem;
         }
+
         /* Tables */
         .table {
             width: 100%;
@@ -750,40 +824,6 @@
         .badge-info {
             background: rgba(59, 130, 246, 0.1);
             color: var(--info);
-        }
-
-        /* Alerts */
-        .alert {
-            padding: 1rem 1.5rem;
-            border-radius: 10px;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .alert-success {
-            background: rgba(16, 185, 129, 0.1);
-            color: #065f46;
-            border: 1px solid rgba(16, 185, 129, 0.2);
-        }
-
-        .alert-danger {
-            background: rgba(239, 68, 68, 0.1);
-            color: #991b1b;
-            border: 1px solid rgba(239, 68, 68, 0.2);
-        }
-
-        .alert-warning {
-            background: rgba(245, 158, 11, 0.1);
-            color: #92400e;
-            border: 1px solid rgba(245, 158, 11, 0.2);
-        }
-
-        .alert-info {
-            background: rgba(59, 130, 246, 0.1);
-            color: #1e40af;
-            border: 1px solid rgba(59, 130, 246, 0.2);
         }
 
         /* Forms */
@@ -966,71 +1006,6 @@
             }
         }
 
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-
-            .main-content {
-                margin-left: 0;
-            }
-
-            .sidebar-toggle {
-                display: block;
-            }
-
-            .sidebar-overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.5);
-                z-index: 999;
-                display: none;
-            }
-
-            .sidebar-overlay.show {
-                display: block;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .content-area {
-                padding: 1rem;
-            }
-
-            .main-header {
-                padding: 0 1rem;
-            }
-
-            .header-campus {
-                display: none;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* DataTables Override */
-        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-            background: var(--primary) !important;
-            color: white !important;
-            border: none !important;
-            border-radius: 6px !important;
-        }
-
-        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-            background: var(--primary-light) !important;
-            color: var(--primary-dark) !important;
-            border: none !important;
-        }
         /* Sidebar Overlay (mobile) */
         .sidebar-overlay {
             position: fixed;
@@ -1078,7 +1053,6 @@
             .header-logo {
                 display: flex;
             }
-
         }
 
         @media (max-width: 768px) {
@@ -1105,6 +1079,13 @@
             .user-btn {
                 padding: 0.5rem;
             }
+
+            .campus-selector-btn span {
+                max-width: 80px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1117,9 +1098,7 @@
             }
         }
 
-        /* ========================================
-           DATATABLES OVERRIDE
-           ======================================== */
+        /* DataTables Override */
         .dataTables_wrapper .dataTables_paginate .paginate_button.current {
             background: var(--primary) !important;
             color: white !important;
@@ -1131,16 +1110,6 @@
             background: var(--primary-light) !important;
             color: var(--primary-dark) !important;
             border: none !important;
-        }
-
-        /* Badge */
-        .badge-primary {
-            background: rgba(102, 126, 234, 0.15);
-            color: var(--primary);
-            padding: 0.3rem 0.6rem;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 600;
         }
     </style>
 
@@ -1204,6 +1173,31 @@
                 <span>Utilisateurs</span>
             </a>
         @endif
+
+        {{-- Menu Super Admin --}}
+        @if(Auth::user()->isSuperAdmin())
+            <div class="menu-section">Super Admin</div>
+
+            <a href="{{ route('super-admin.dashboard') }}" class="menu-item {{ request()->routeIs('super-admin.dashboard') ? 'active' : '' }}">
+                <i class="fas fa-crown"></i>
+                <span>Dashboard Global</span>
+            </a>
+
+            <a href="{{ route('super-admin.campuses') }}" class="menu-item {{ request()->routeIs('super-admin.campuses') ? 'active' : '' }}">
+                <i class="fas fa-building"></i>
+                <span>Gérer Campus</span>
+            </a>
+
+            <a href="{{ route('super-admin.users') }}" class="menu-item {{ request()->routeIs('super-admin.users') ? 'active' : '' }}">
+                <i class="fas fa-user-shield"></i>
+                <span>Tous Utilisateurs</span>
+            </a>
+
+            <a href="{{ route('super-admin.comparatif') }}" class="menu-item {{ request()->routeIs('super-admin.comparatif') ? 'active' : '' }}">
+                <i class="fas fa-balance-scale"></i>
+                <span>Comparatif</span>
+            </a>
+        @endif
     </nav>
 
 </aside>
@@ -1227,10 +1221,61 @@
             </div>
         </div>
         <div class="header-right">
-            <div class="header-campus">
-                <i class="fas fa-building"></i>
-                Campus: <strong>{{ Auth::user()->campus->nomCampus ?? 'Principal' }}</strong>
-            </div>
+            {{-- ========================================
+                SELECTEUR DE CAMPUS (Super Admin uniquement)
+                ======================================== --}}
+            @if(Auth::user()->isSuperAdmin())
+                @php
+                    $allCampuses = \App\Models\Campus::orderBy('nomCampus')->get();
+                    $selectedCampusId = Session::get('selected_campus_id');
+                    $currentCampusName = 'Tous les campus';
+
+                    if ($selectedCampusId && $selectedCampusId !== 'all') {
+                        $currentCampus = $allCampuses->firstWhere('id', $selectedCampusId);
+                        $currentCampusName = $currentCampus ? $currentCampus->nomCampus : 'Tous les campus';
+                    }
+                @endphp
+                <div class="campus-selector">
+                    <button class="campus-selector-btn" id="campusSelectorBtn">
+                        <i class="fas fa-building"></i>
+                        <span>{{ $currentCampusName }}</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="campus-selector-menu" id="campusSelectorMenu">
+                        <div class="campus-selector-header">
+                            <i class="fas fa-crown"></i> Mode Super Admin
+                        </div>
+                        <form action="{{ route('super-admin.switch-campus') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="campus_id" value="all">
+                            <button type="submit" class="campus-selector-item {{ $selectedCampusId === 'all' || !$selectedCampusId ? 'active' : '' }}">
+                                <i class="fas fa-globe"></i> Tous les campus
+                            </button>
+                        </form>
+                        <div class="campus-selector-divider"></div>
+                        @foreach($allCampuses as $campus)
+                            <form action="{{ route('super-admin.switch-campus') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="campus_id" value="{{ $campus->id }}">
+                                <button type="submit" class="campus-selector-item {{ $selectedCampusId == $campus->id ? 'active' : '' }}">
+                                    <i class="fas fa-map-marker-alt"></i> {{ $campus->nomCampus }}
+                                </button>
+                            </form>
+                        @endforeach
+                        <div class="campus-selector-divider"></div>
+                        <a href="{{ route('super-admin.dashboard') }}" class="campus-selector-item campus-selector-link">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard Super Admin
+                        </a>
+                    </div>
+                </div>
+            @else
+                {{-- Affichage campus normal pour admin --}}
+                <div class="header-campus">
+                    <i class="fas fa-building"></i>
+                    Campus: <strong>{{ Auth::user()->campus->nomCampus ?? 'Principal' }}</strong>
+                </div>
+            @endif
+
             <div class="user-dropdown">
                 <button class="user-btn" id="userDropdownBtn">
                     <div class="user-avatar">
@@ -1246,7 +1291,7 @@
                     </div>
                     <a href="#" class="dropdown-item" style="pointer-events: none;">
                         <i class="fas fa-shield-alt"></i>
-                        <span class="badge-primary">{{ ucfirst(Auth::user()->role) }}</span>
+                        <span class="badge-primary">{{ ucfirst(str_replace('_', ' ', Auth::user()->role)) }}</span>
                     </a>
                     <div class="dropdown-divider"></div>
                     <a href="{{ route('logout') }}" class="dropdown-item danger"
@@ -1306,6 +1351,8 @@
     const collapseBtn = document.getElementById('collapseBtn');
     const userDropdownBtn = document.getElementById('userDropdownBtn');
     const userDropdownMenu = document.getElementById('userDropdownMenu');
+    const campusSelectorBtn = document.getElementById('campusSelectorBtn');
+    const campusSelectorMenu = document.getElementById('campusSelectorMenu');
 
     // Check if mobile
     const isMobile = () => window.innerWidth <= 992;
@@ -1318,7 +1365,6 @@
         } else {
             sidebar.classList.toggle('collapsed');
             mainContent.classList.toggle('expanded');
-            // Save preference
             localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
         }
     });
@@ -1346,11 +1392,23 @@
     userDropdownBtn?.addEventListener('click', (e) => {
         e.stopPropagation();
         userDropdownMenu.classList.toggle('show');
+        campusSelectorMenu?.classList.remove('show');
     });
 
+    // Campus Selector Dropdown (Super Admin)
+    campusSelectorBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        campusSelectorMenu.classList.toggle('show');
+        userDropdownMenu?.classList.remove('show');
+    });
+
+    // Close dropdowns when clicking outside
     document.addEventListener('click', (e) => {
         if (!e.target.closest('.user-dropdown')) {
             userDropdownMenu?.classList.remove('show');
+        }
+        if (!e.target.closest('.campus-selector')) {
+            campusSelectorMenu?.classList.remove('show');
         }
     });
 
