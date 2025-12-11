@@ -1,3 +1,4 @@
+@php use Illuminate\Support\Facades\Session; @endphp
 {{--
     Composant : Sélecteur de Campus pour Super Admin
     À inclure dans le header/navbar du layout admin
