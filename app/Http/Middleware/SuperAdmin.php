@@ -8,10 +8,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SuperAdmin
 {
-    /**
-     * Handle an incoming request.
-     * Vérifie que l'utilisateur est super admin
-     */
     public function handle(Request $request, Closure $next): Response
     {
         if (!auth()->check()) {
@@ -19,7 +15,8 @@ class SuperAdmin
         }
 
         if (!auth()->user()->isSuperAdmin()) {
-            abort(403, 'Accès réservé aux super administrateurs.');
+            return redirect()->route('tools')
+                ->with('error', 'Acces reserve aux super administrateurs.');
         }
 
         return $next($request);
